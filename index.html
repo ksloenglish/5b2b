@@ -1,0 +1,1383 @@
+<!DOCTYPE html><html lang="en"><head><meta name="x-poe-datastore-behavior" content="local_only"><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oxford 5000 B2 Revision Exercise</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+        :root {
+            --bg-color: #1a1a2e;
+            --container-bg: #16213e;
+            --primary-color: #0f3460;
+            --accent-color: #e94560;
+            --text-color: #e0e0e0;
+            --light-gray: #a0a0a0;
+            --correct-color: #28a745;
+            --incorrect-color: #dc3545;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 800px;
+            background-color: var(--container-bg);
+            border-radius: 15px;
+            padding: 20px 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        header {
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            color: var(--accent-color);
+            font-size: 1.2rem;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        header h2 {
+            font-size: 2rem;
+            margin: 10px 0;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        header p {
+            color: var(--light-gray);
+            margin: 0;
+        }
+
+        #start-screen, #quiz-screen, #end-screen {
+            display: none;
+        }
+
+        #start-screen h3 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .question-count-options {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #ff6b81;
+            transform: translateY(-2px);
+        }
+
+        #quiz-screen .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        #question-counter, #score-counter {
+            font-size: 1rem;
+            font-weight: 600;
+            background-color: var(--primary-color);
+            padding: 5px 15px;
+            border-radius: 5px;
+        }
+
+        #return-btn {
+            background: none;
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        #return-btn:hover {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        #question-text {
+            font-size: 1.4rem;
+            line-height: 1.8;
+            margin: 30px 0;
+            min-height: 80px;
+        }
+
+        .blank {
+            display: inline-block;
+            min-width: 100px;
+            width: auto;
+            border-bottom: 2px solid var(--accent-color);
+            vertical-align: bottom;
+            margin: 0 5px;
+            text-align: center;
+        }
+        
+        .blank.revealed {
+            border-bottom: none;
+            color: var(--correct-color);
+            font-weight: bold;
+            min-width: auto;
+            display: inline;
+        }
+
+        #options-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .option-btn {
+            width: 100%;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            border: 2px solid transparent;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: lowercase; 
+        }
+
+        .option-btn:hover:not(:disabled) {
+            border-color: var(--accent-color);
+        }
+
+        .option-btn.correct {
+            background-color: var(--correct-color);
+            border-color: var(--correct-color);
+            color: white;
+        }
+
+        .option-btn.incorrect {
+            background-color: var(--incorrect-color);
+            border-color: var(--incorrect-color);
+            color: white;
+        }
+
+        .option-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        #feedback-container {
+            min-height: 50px;
+            margin-top: 20px;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        #next-btn {
+            margin-top: 15px;
+            display: none;
+        }
+
+        #end-screen h2 {
+            font-size: 1.8rem;
+        }
+        #final-score {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin: 20px 0;
+        }
+        #end-comment {
+            font-size: 1.2rem;
+            color: var(--light-gray);
+            margin-bottom: 30px;
+        }
+
+        #revision-container {
+            margin-top: 30px;
+            text-align: left;
+            max-height: 40vh;
+            overflow-y: auto;
+            border-top: 2px solid var(--primary-color);
+            padding: 20px 10px;
+        }
+
+        #revision-list .revision-item {
+            background-color: var(--primary-color);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        #revision-list .revision-item p {
+            margin: 0 0 8px 0;
+            line-height: 1.5;
+        }
+
+        #revision-list .revision-item .word-info {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--accent-color);
+        }
+
+        #revision-list .revision-item .word-info span {
+            color: var(--text-color);
+        }
+
+        #revision-list .revision-item .sentence-info {
+            color: var(--light-gray);
+            font-style: italic;
+        }
+
+        #revision-list .revision-item .sentence-info strong {
+            color: var(--correct-color);
+            font-style: normal;
+        }
+
+        footer {
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid var(--primary-color);
+            color: var(--light-gray);
+            font-size: 0.8rem;
+            text-align: center;
+        }
+
+        #error-message {
+            color: var(--incorrect-color);
+            background: rgba(220, 53, 69, 0.1);
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        @media (max-width: 600px) {
+            .app-container {
+                padding: 15px;
+            }
+            header h2 {
+                font-size: 1.5rem;
+            }
+            #question-text {
+                font-size: 1.2rem;
+            }
+            #options-container {
+                grid-template-columns: 1fr;
+            }
+            .option-btn {
+                font-size: 1rem;
+            }
+            .blank {
+                min-width: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <header>
+        <h1>K S Lo English</h1>
+        <h2>Oxford 5000 B2<br>Revision Exercise</h2>
+        <p>Words 368 (interaction) - 734 (wrist)</p>
+    </header>
+
+    <div id="error-message"></div>
+
+    <!-- Start Screen -->
+    <div id="start-screen">
+        <h3>How many questions would you like to attempt?</h3>
+        <div class="question-count-options">
+            <button class="btn" onclick="startQuiz(10)">10</button>
+            <button class="btn" onclick="startQuiz(20)">20</button>
+            <button class="btn" onclick="startQuiz(30)">30</button>
+            <button class="btn" onclick="startQuiz(40)">40</button>
+            <button class="btn" onclick="startQuiz(50)">50</button>
+            <button class="btn" onclick="startQuiz(100)">100</button>
+        </div>
+    </div>
+
+    <!-- Quiz Screen -->
+    <div id="quiz-screen">
+        <div class="quiz-header">
+            <div id="question-counter">Question: 1 / 20</div>
+            <button id="return-btn" onclick="initApp()">Return to Title</button>
+            <div id="score-counter">Score: 0</div>
+        </div>
+        <div id="question-text">
+            <!-- Question text goes here -->
+        </div>
+        <div id="options-container">
+            <!-- Options go here -->
+        </div>
+        <div id="feedback-container"></div>
+        <button id="next-btn" class="btn" onclick="nextQuestion()">Next Question</button>
+    </div>
+
+    <!-- End Screen -->
+    <div id="end-screen">
+        <h2>Quiz Complete!</h2>
+        <p>You scored:</p>
+        <div id="final-score"></div>
+        <div id="end-comment"></div>
+        <button class="btn" onclick="initApp()">Start Again</button>
+        
+        <div id="revision-container">
+            <h3>Review Your Answers</h3>
+            <div id="revision-list">
+                <!-- Revision items go here -->
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        © <span id="year"></span> K S Lo English. All Rights Reserved.
+    </footer>
+</div>
+
+<script>
+    // --- Data ---
+    const rawCsvData = `interaction,n,交流，交往；相互作用，相互影響,There's not enough interaction between the management and the workers.
+interpretation,n,解釋，闡釋；理解,The dispute is based on two widely differing interpretations of the law.
+interval,n,間隔；間距,We see each other at regular intervals - usually about once a month.
+invade,v,入侵，侵略,Concentrations of troops near the border look set to invade within the next few days.
+invasion,n,入侵，侵略,They were planning to mount an invasion of the north of the country.
+investor,n,投資者,A New York investor offered to acquire the company's shares for $13 each.
+isolate,v,隔離；孤立；分離,A high wall isolated the house from the rest of the village.
+isolated,adj,偏遠的,They live in an isolated village.
+jail,n,監獄；看守所,the country's overcrowded jails
+jail,v,監禁,He was jailed for three years.
+jet,n,噴射機,We flew on a jet plane.
+joint,adj,共有的，共用的；共同的,They opened a joint bank account.
+joint,n,關節,The knee is a complex joint.
+journalism,n,新聞工作；新聞業,I'd like a career in journalism.
+jury,n,陪審團,The members of the jury reached a verdict.
+kit,n,（用於某種目的或活動的）成套工具（或服裝）,He keeps a tool kit in his car.
+ladder,n,梯子,"She was up a ladder, cleaning the window."
+landing,n,著陸；靠岸,One person has died after the pilot of a light aircraft was forced to make a crash/emergency landing in a field.
+lane,n,鄉間小路；小巷，小街，胡同,He drives so fast along those narrow country lanes.
+lately,adv,最近，近來,I haven't been feeling so well lately.
+leaflet,n,傳單，活頁；（單頁）廣告,Demonstrators handed out leaflets to passers-by.
+legend,n,傳說，傳奇故事；民間故事,The dance was based on several Hindu legends.
+lens,n,鏡片，鏡頭，透鏡,He bought a camera with a zoom lens.
+lifetime,n,有生之年，終生，一輩子,We'll see a tremendous lot of technological changes during/in our lifetime.
+lighting,n,（房間、房屋、劇院等處的）照明，燈光設計,The room has excellent natural lighting.
+likewise,adv,同樣，照樣，也一樣,"Just water these plants twice a week, and likewise the ones in the bedroom."
+limitation,n,限制，限定,the limitation of nuclear weapons
+literally,adv,確實地；名副其實地,They were responsible for literally millions of deaths.
+literary,adj,文學的，與文學相關的,She is a famous literary critic.
+litre,n,（度量單位）升,The tax increase will add 4p to a litre of petrol.
+litter,n,（散落在公共場所的）小塊垃圾，廢棄物,About two percent of fast-food packaging ends up as litter.
+logo,n,（公司的）標誌，標識,The company designed a new corporate logo.
+lottery,n,抽彩，抽獎,He won a million dollars in the national lottery.
+loyal,adj,忠實的，忠誠的,Jack has been a loyal worker in this company for almost 50 years.
+lyric,n,（尤指流行歌曲的）歌詞,Paul Simon writes the lyrics for most of his songs.
+magnificent,adj,極好的；壯麗的；令人羨慕的,The hotel room had a magnificent view.
+make-up,n,化妝品,She never wears make-up.
+making,n,製造；製作；形成；產生,the art of filmmaking
+manufacture,v,（通常指工廠利用機械大量）製造，（大批）生產,He works for a company that manufactures car parts.
+manufacturing,n,製造業（生產大批商品的行業）,The city is known for car manufacturing.
+marathon,n,馬拉松賽跑（全長42.195公里）,She is training for the London marathon.
+margin,n,差數，差額,The Senate approved the use of military force by a margin of 52 votes to 47.
+marker,n,標識，標誌,I've put in some markers where I planted the seeds.
+martial,adj,軍隊的；戰爭的；軍事的,Renegade forces captured the capital and declared/imposed martial law.
+mate,n,（動物的）配偶,Peacocks use their beautiful tails to attract mates.
+mate,v,（使）交配,Tigers mate repeatedly over a period of several days.
+mayor,n,市長,the Mayor of New York
+mechanic,n,技師；機工；機械師,He works as a car mechanic.
+mechanical,adj,機械的；機械零件的,The clock is a complex mechanical device.
+mechanism,n,機械零件；機械裝置,These automatic cameras have a special focusing mechanism.
+medal,n,獎章；獎牌；勳章；紀念章,He was awarded a medal for bravery.
+medication,n,藥物，藥劑,He is currently on/taking medication for his heart.
+membership,n,會員資格，會員身份，會籍,You have to apply for membership of the sports club.
+memorable,adj,難忘的；值得紀念的,a memorable performance
+metaphor,n,隱喻；暗喻,"""The mind is an ocean"" and ""the city is a jungle"" are both metaphors."
+miner,n,礦工,His father worked as a coal miner.
+miserable,adj,痛苦的；可憐的,She's miserable living on her own.
+mode,n,方法；做法；方式,Each department in the company has its own mode of operation.
+modest,adj,不大（或多、貴）的；適中的,"They live in a fairly modest house, considering their wealth."
+monster,n,（虛構的）怪物，怪獸,The story is about a giant sea monster.
+monthly,adj,每月（的）；每月一次（的）；按月（的）,We have to make monthly payments on the car.
+monument,n,紀念碑；紀念塔；紀念館,In the square in front of the hotel stands a monument to all the people killed in the war.
+moreover,adv,而且，再者，此外,"The whole report is badly written. Moreover, it's inaccurate."
+mortgage,n,（尤指購房的）按揭，抵押貸款,"They took out a £40o,000 mortgage (= they borrowed £40o,000) to buy the house."
+mosque,n,清真寺,I used to pray at the local mosque with my father and grandfather.
+motion,n,動；運動；移動,The violent motion of the ship upset his stomach.
+motivate,v,使產生動機；激起,"Like so many people, he's motivated by greed."
+motivation,n,積極性,He's a bright enough student - he just lacks motivation.
+moving,adj,行進中的；活動的,It is difficult to hit a moving target.
+myth,n,神話,The book is a collection of ancient myths.
+naked,adj,未穿衣的，裸體的,The painting depicts a naked man.
+nasty,adj,糟糕的；令人不快的，讓人討厭的,The news came as a nasty shock.
+navigation,n,領航（術）；導航（術）,"In the past, navigation depended on a knowledge of the positions of the stars."
+nearby,adj,在附近的,Her mother lived in a nearby town.
+nearby,adv,在附近；附近地,I noticed a policeman standing nearby.
+necessity,n,必要，需要,"You can come early if you want to, but there's no necessity for it."
+negotiate,v,（就…）談判，（就…）磋商,The government has refused to negotiate with the strikers.
+negotiation,n,談判，磋商，洽談,The agreement was reached after a series of difficult negotiations.
+neutral,adj,中立的，不偏不倚的,"If there's an argument between my daughter and her mother, it's important that I remain neutral."
+newly,adv,最近，新近,She joined the newly formed residents' association.
+norm,n,行為準則；規範,"Europe's varied cultural, political and ethical norms"
+notebook,n,筆記本,She was jotting things down in a little notebook.
+novelist,n,小說家,Charles Dickens was a famous novelist.
+nowadays,adv,如今，現在,Who remembers those movies nowadays?
+nursing,adj,（女性）哺乳的，餵奶的,Nursing mothers are advised to eat plenty of leafy green vegetables.
+nutrition,n,營養物質；營養，滋養,Good nutrition is essential if patients are to make a quick recovery.
+obesity,n,肥胖,The National Institute of Health is discussing ways of tackling the problem of childhood obesity.
+observer,n,觀察者，觀察家,He is a keen observer of the political situation.
+obstacle,n,障礙；阻礙；妨礙,The biggest obstacle in our way was a tree trunk in the road.
+occupation,n,職業；工作,"In the space marked ""occupation"" she wrote ""police officer""."
+occupy,v,佔有，佔用，佔據（空間或時間）,The rest of the time was occupied with writing a report.
+offender,n,罪犯；有罪者，犯法的人,first-time offenders
+ongoing,adj,持續存在的；不斷發展的；繼續進行的；進行中的,an ongoing investigation/process/project
+openly,adv,公開地；坦率地，坦誠地；毫不隱諱地,They were openly contemptuous of my suggestions.
+opera,n,歌劇,"""Carmen"" is my favourite opera."
+operator,n,操作員，業務員；駕駛員,She works as a computer operator.
+optimistic,adj,樂觀的,She is optimistic about her chances of winning a gold medal.
+orchestra,n,管弦樂隊,She's a cellist in the City of Birmingham Symphony Orchestra.
+organic,adj,有機的，不使用化肥的,We prefer to buy organic food.
+outfit,n,（為特定場合或活動而穿的）全套服裝，裝束,I'm going to wear my vampire outfit for Halloween.
+output,n,（人、機器、工廠、國家等的）產量,Last year manufacturing output fell by 14 percent.
+outstanding,adj,優秀的；卓越的；出眾的,an outstanding performance/writer/novel/year
+overcome,v,克服；戰勝；攻克；解決,Juventus overcame Ajax in a thrilling game.
+overnight,adv,一夜間；在夜間，在晚上,You can stay overnight if you want to.
+overseas,adv,在海外；從國外來；到國外,Many more people go/travel/live/work overseas these days.
+overseas,adj,在海外的；從國外來的；到國外的,We need to open up overseas markets.
+ownership,n,所有權；物主身份；擁有,Do you have any proof of ownership of/for this car?
+oxygen,n,氧，氧氣,The patient didn't seem to be getting enough oxygen.
+packet,n,小包，小盒，小袋,He ate a whole packet of crisps.
+palm,n,手掌，手心,This tiny device fits into the palm of your hand.
+panic,n,恐慌，驚慌,a state of panic
+parade,n,（慶祝）遊行,The team had a victory parade after winning the cup.
+parallel,adj,平行的,Draw a pair of parallel lines.
+parallel,n,可相比擬的事物；相似之處,I'm trying to see if there are any obvious parallels between the two cases.
+participation,n,參加，參與,Your participation in this investigation is vital.
+partnership,n,合夥關係，夥伴關係,Theirs was a very productive partnership.
+part-time,adj,部分時間的，兼職的,She is looking for a part-time job.
+part-time,adv,部分時間地，兼職地,After my children were born I decided to go part-time.
+passionate,adj,情緒激昂的，熱情的,The leader gave a passionate speech.
+password,n,口令；密碼,I can't let you in unless you give the password.
+patience,n,忍耐，耐心,You have to have such a lot of patience when you're dealing with kids.
+pause,v,暫停，停頓,He paused and thought for a moment.
+pause,n,暫停,There will be a brief pause in the proceedings while the piano is moved into place.
+peer,n,同齡人；同輩；同儕；同等社會地位（或能力）的人,Do you think it's true that teenage girls are less self-confident than their male peers?
+penalty,n,刑罰，懲罰，處罰,The law carries a penalty of up to three years in prison.
+perceive,v,認為；看待；視為,How do the French perceive the British?
+perception,n,見解，觀念，看法,We have to change the public's perception that money is being wasted.
+permanently,adv,總是；持久地；永久地,Smoking is likely to damage your health permanently.
+pill,n,藥丸；藥片,He took a sleeping pill.
+pity,n,同情，憐憫,The girl stood gazing in/with pity at the old lion in the cage.
+placement,n,臨時職位（或工作）,I think we can find a placement for you in the sales department.
+portion,n,一部分；一份,A large/major portion of the company's profit goes straight back into new projects.
+potentially,adv,潛在地；可能地,Hepatitis is a potentially fatal disease.
+precede,v,（指時間或空間上）處在…之前，先於,Kofi Annan preceded Ban Ki-moon as the Secretary-General of the UN.
+precious,adj,珍貴的，寶貴的,Time is a precious gift.
+precise,adj,精確的；準確的，確切的,The bunker's precise location is a closely guarded secret.
+precisely,adv,精確地，準確地，確切地,The fireworks begin at eight o'clock precisely.
+predictable,adj,可預言的；可預計的，可預料的,Comets appear at predictable times.
+preference,n,偏愛；愛好；喜愛,Her preference is for comfortable rather than stylish clothes.
+pride,n,自豪，得意,She felt a great sense of pride as she watched him accept the award.
+primarily,adv,主要地,We're primarily concerned with keeping expenditure down.
+principal,adj,最重要的,Iraq's principal export is oil.
+prior,adj,在先的，在前的；居先的,The course required no prior knowledge of Spanish.
+probability,n,可能性,What is the probability of winning?
+probable,adj,很可能真實的；很可能發生的,The probable cause of death was heart failure.
+proceed,v,繼續進行，繼續做,His lawyers have decided not to proceed with the case.
+programming,n,（電腦的）程式,He has a degree in computer programming.
+progressive,adj,逐漸的；漸進的,There's been a progressive decline in the standard of living over the past few years.
+prohibit,v,禁止；阻止,Motor vehicles are prohibited from driving in the town centre.
+promising,adj,有希望的；有出息的；有前途的,They won the award for the most promising new band of the year.
+promotion,n,促銷，推銷；宣傳,The store is having a big sales promotion.
+prompt,v,引起；導致；激起,The bishop's speech has prompted an angry response from both political parties.
+proportion,n,部分；份額,Children make up a large proportion of the world's population.
+protein,n,蛋白質,"Vegans get all the protein they need from nuts, seeds, beans and cereals."
+protester,n,抗議者，抗議人士,A peace protester was conditionally discharged for twelve months .
+psychological,adj,心理的；心理學的,He is suffering from psychological problems.
+publicity,n,宣傳活動；宣傳，推廣；關注,He attracted a lot of adverse/bad publicity with his speech about unmarried mothers.
+publishing,n,出版業,She wants to pursue a career in publishing.
+punk,n,龐克（尤指20世紀70年代末服裝、髮型怪異，透過駭人的舉止和吵鬧的快節奏音樂對抗權威的年輕人的文化）,They started a punk band in high school.
+purely,adv,僅僅，純粹地,"On a purely practical level, it is difficult to see how such proposals would work."
+pursuit,n,嗜好，消遣，娛樂,"I enjoy outdoor pursuits, like hiking and riding."
+puzzle,n,令人費解的情況；難題；謎,Scientists have been trying to solve this puzzle for years.
+questionnaire,n,問卷；情況調查表,Visitors to the country have been asked to fill in a detailed questionnaire.
+racial,adj,種族的；種族間的；種族關係的,racial discrimination/prejudice
+racism,n,種族主義；種族歧視，種族迫害,The authorities are taking steps to combat/fight/tackle racism in schools.
+racist,adj,種族主義的,He furiously denied being racist.
+racist,n,種族主義者,Two of the killers are known to be racists.
+radiation,n,（核）輻射,Many servicemen suffered radiation sickness after the early atomic tests.
+rail,n,鐵路交通；鐵路交通系統,Environmentalists argue that more goods should be transported by rail.
+random,adj,任意的；隨機的；胡亂的,The police perform random checks on drivers.
+rat,n,鼠；老鼠；大家鼠,Rats carry disease.
+rating,n,等級，級別；程度,The government's approval/popularity rating sank to an all-time low.
+reasonably,adv,理性地；有理智地；通情達理地,Stop shouting and let's discuss this reasonably.
+rebuild,v,重建；改建；使恢復原狀,The cathedral was completely rebuilt in 1425 after it had been destroyed by fire.
+receiver,n,（電話）聽筒,She picked up the receiver and dialled his number.
+recession,n,（經濟）衰退期,The country is sliding into the depths of (a) recession.
+reckon,v,想；認為，以為,I reckon it's going to rain.
+recognition,n,承認；認可；接受,"It's a new country, hoping for diplomatic recognition from the international community."
+recovery,n,（在疾病或受傷之後）恢復健康,Mira made a full recovery from the operation.
+recruit,v,招聘，吸收；（尤指軍隊）徵募新兵,Charities such as Oxfam are always trying to recruit volunteers to help in their work.
+recruit,n,新成員，新來的人；（尤指）新兵,Raw recruits (= completely new soldiers) were trained for six months and then sent to the war front.
+recruitment,n,招聘，吸收；（尤指軍隊）徵募新兵,The recession has forced a lot of companies to cut down on graduate recruitment.
+referee,n,裁判，裁判員,We only lost the game because the referee was biased.
+refugee,n,難民；避難者；逃亡者,Thousands of refugees fled across the border.
+registration,n,登記；註冊；掛號,The deadline for voter registration is tomorrow.
+regulate,v,（尤指使按照某種方式運作而）控制，管理，調節，調整,You can regulate the temperature in the house by adjusting the thermostat.
+reinforce,v,加固；使更結實,The pockets on my jeans are reinforced with double stitching.
+relieve,v,緩解，減輕，解除（疼痛或擔憂）；使寬心，使寬慰,She was given a shot of morphine to relieve the pain.
+relieved,adj,寬慰的；放心的；解脫的,I'm so relieved to find you - I thought you'd already gone.
+remarkable,adj,非凡的；奇異的；引人注目的,Nelson Mandela was a truly remarkable man.
+remarkably,adv,非凡；奇異；引人注目,It is a remarkably noisy and crowded city.
+reporting,n,報道；報告；記述,The newspaper is known for its objective reporting.
+resign,v,辭職；辭去（職務）；放棄（工作）,He resigned from the company in order to take a more challenging job.
+resolution,n,決議；正式決定,to approve/adopt a resolution
+restore,v,修復；使重定；使復職,The badly neglected paintings have all been carefully restored.
+restrict,v,限制；限定；妨礙,measures to restrict the sale of alcohol
+restriction,n,受（尤指官方）限制的，受約束的,The government imposed new import restrictions.
+retail,n,零售，零賣,The job is open to applicants with over two years' experience in retail.
+retirement,n,退休；退職；退役,Many teachers over the age of 50 are taking early retirement.
+revenue,n,（政府的）稅收，歲入；（公司的）收益,Taxes provide most of the government's revenue.
+revision,n,修正；修改,These proposals will need a lot of revision.
+ridiculous,adj,愚蠢的；荒唐的；可笑的,Do I look ridiculous in this hat?
+risky,adj,危險的；有風險的,It's risky to buy a car without some good advice.
+rival,n,競爭對手；敵手,He beat his closest/nearest rival by 20 marks.
+rival,adj,競爭的；敵對的,a rival bid/claim/offer
+rob,v,搶劫，掠奪；盜取,The terrorists financed themselves by robbing banks.
+robbery,n,搶劫；盜竊,The gang admitted they had committed four recent bank robberies.
+rocket,n,火箭；火箭引擎；火箭彈,They launched a rocket to the planet Venus.
+romance,n,（通常短暫的）戀愛關係，羅曼史，風流韻事,They got married last year after a whirlwind (= very short and unexpected) romance.
+rose,n,玫瑰；薔薇,She planted a rose bush in the garden.
+roughly,adv,大致地，近似地，粗略地,There has been an increase of roughly 2.25 million.
+ruin,v,（完全）毀掉，毀壞；破壞；糟踏,Huge modern hotels have ruined this once unspoilt coastline.
+ruin,n,毀掉，毀壞，破壞,The car accident meant the ruin of all her hopes.
+satisfaction,n,滿足，滿意,She looked at the finished painting with satisfaction.
+scandal,n,醜行；醜聞；震驚；反感,The minister resigned after the political scandal.
+scare,v,（使）驚恐，（使）害怕；受驚嚇，感到害怕,Sudden noises scare her.
+scare,n,驚恐，恐慌,I got/had a scare (= I was very worried) when I looked at my bank statement this morning!
+scenario,n,可能發生的事態；設想； 場景,There are several possible scenarios.
+scholar,n,（尤指大學的）學者,He is a distinguished history scholar.
+scholarship,n,學問；學術；學術研究,This book is a work of great scholarship.
+scratch,v,抓；搔；擦；劃,We scratched the wall trying to get the bed into Martha's room.
+scratch,n,抓痕；擦痕；劃痕；刮痕,Her legs were covered in scratches and bruises after her walk through the forest.
+screening,n,電影放映,"There will be three screenings of the film - at 3 p.m., 5 p.m., and 7 p.m."
+seeker,n,搜索者；探求者,asylum seekers
+seminar,n,專題討論會；研討會,I attended practically every lecture and seminar when I was a student.
+settler,n,（尤指來自別國的）移居者，定居者；殖民者,Most of the settlers came from England.
+severely,adv,嚴重地,Their daughter was severely injured in a car accident.
+sexy,adj,性感的,The actress wore a sexy dress.
+shaped,adj,呈…形狀的,He found an unusually shaped carrot.
+shocking,adj,令人厭惡的；令人難過的；不道德的,The sex scenes in the book were considered very shocking at the time when it was published.
+shore,n,（海、湖或大河的）濱，岸,You can walk for miles along the shore.
+short-term,adj,持續時間短的，暫時的,The accident affected his short-term memory.
+shortage,n,缺乏，缺少,There's a shortage of food and shelter in the refugee camps.
+shortly,adv,不久，很快,We will shortly be arriving in King's Cross Station.
+sibling,n,兄；弟；姐；妹,I have four siblings: three brothers and a sister.
+signature,n,簽名,I mistook your signature and thought the letter was from someone else.
+significance,n,重要性，重要意義,The discovery of the new drug is of great significance for/to people suffering from heart problems.
+skilled,adj,熟練的；有技術的,My mother is very skilled at/in dressmaking.
+skull,n,頭（蓋）骨，顱骨,The soldiers discovered a pile of human skulls and bones.
+slogan,n,標語，口號；廣告語,They came up with a catchy advertising slogan.
+so-called,adj,所謂的，號稱的,It was one of his so-called friends who supplied him with the drugs that killed him.
+somehow,adv,以某種方法，以某種方式,"It won't be easy, but we'll get across the river somehow."
+sometime,adv,（將來或過去的）某個時候,sometime before June
+sophisticated,adj,精於世故的，老練的；見多識廣的；很有品味的,"She was slim, svelte, and sophisticated."
+spare,adj,額外的，備用的；多餘的,I always keep a spare key with my neighbor.
+specialize,v,專門研究，專攻；專門從事,She hired a lawyer who specializes in divorce cases.
+specify,v,具體說明；明確指出,He said we should meet but didn't specify a time.
+spectacular,adj,壯觀的，壯麗的；令人驚歎的,The mountain top offers a spectacular view.
+spectator,n,（尤指體育賽事的）觀眾,"They won 4–0 in front of over 40,000 cheering spectators."
+speculate,v,猜測；推測，推斷,I don't know why she did it - I'm just speculating.
+speculation,n,猜測；推測，推斷,Rumours that they are about to marry have been dismissed as pure speculation.
+spice,n,（調味）香料,"Cinnamon, ginger, and cloves are all spices."
+spill,v,（使）灑出；（使）流出；（使）濺出； （使）湧出,I spilled coffee on my silk shirt.
+spite,n,惡意；怨恨,I'm sure he only said it out of spite.
+spoil,v,破壞；糟蹋；毀掉,He tried not to let the bad news spoil his evening.
+spokesman,n,發言人,A spokesman for the dockyard said they hoped to launch the first submarine within two years.
+spokesperson,n,發言人,A spokesperson for the airline said that flights would run as scheduled.
+spokeswoman,n,女發言人,A spokeswoman for the group announced the news.
+sponsorship,n,贊助費，資助金,The orchestra receives £2 million a year in sponsorship from companies.
+sporting,adj,體育運動的,The Olympics is the biggest sporting event in the world.
+stall,n,貨攤，攤位；販賣處,"In the village market, the stalls are piled high with local vegetables."
+stance,n,（尤指公開表明的）觀點，立場,The doctor's stance on the issue of abortion is well known.
+starve,v,（使）挨餓；（使）餓死,Whole communities starved to death during the long drought.
+steadily,adv,逐漸地；穩步地,Prices have risen steadily.
+steam,n,蒸汽，水蒸氣,Steam rose from the simmering stew.
+stimulate,v,激發，激勵；促進,The government plans to cut taxes in order to stimulate the economy.
+strengthen,v,增強，加強；鞏固,They have been strengthening their border defences in preparation for war.
+strictly,adv,嚴格地，嚴厲地,The speed limit is strictly enforced on urban roads.
+stroke,n,中風,She suffered/had a stroke that left her unable to speak.
+stunning,adj,極漂亮的，極迷人的,She wore a stunning dress to the party.
+subsequent,adj,隨後的，接著的,The book discusses his illness and subsequent resignation from politics.
+subsequently,adv,隨後，接著,The original interview notes were subsequently lost.
+suburb,n,城郊；近郊住宅區,Box Hill is a suburb of Melbourne.
+suffering,n,疼痛；折磨；痛苦,The war will cause widespread human suffering.
+sufficient,adj,足夠的，充足的,This recipe should be sufficient for five people.
+sufficiently,adv,足夠，充足,The following day she felt sufficiently well to go to work.
+super,adj,出色的，極好的,The Natural History Museum is a super place for kids.
+surgeon,n,外科醫生,The surgeon makes a small incision into which a tube is inserted.
+survival,n,繼續生存，存活，倖存,The doctors told my wife I had a 50/50 chance of survival.
+survivor,n,倖存者，生還者,He was the sole (= only) survivor of the plane crash.
+suspend,v,停止，暫停，中止,The ferry service has been suspended for the day because of bad weather.
+sustainable,adj,可持續的，能長期保持的,That sort of extreme diet is not sustainable over a long period.
+swallow,v,吞嚥，吞下，嚥下,My throat is so sore that it really hurts when I swallow.
+sympathetic,adj,有同情心的，同情的,"He suffers from back trouble too, so he was very sympathetic about my problem."
+tackle,v,對付，處理；與…交涉,There are many ways of tackling this problem.
+tag,n,標籤，標牌,I forgot to remove the price tag.
+tag,v,給…貼上標籤，給…掛上標牌,Each animal was tagged with a number for identification.
+tap,v,（常指連續）輕拍，輕叩，輕敲,The branches tapped against the window.
+tap,n,（水）龍頭，閥門,Turn on the hot tap.
+technological,adj,技術的，關於（或涉及）技術的,Technological advances in computing and telecommunications have reduced the need for many people to travel to work.
+teens,n,十幾歲,Both my daughters are in their teens.
+temple,n,廟宇，寺院；神殿,The roof of the temple was held up by a row of thick stone columns.
+temporarily,adv,短暫；暫時，臨時,We regret this service is temporarily unavailable.
+tendency,n,（思想、行為等的）傾向,His tendency to exaggerate is well known.
+tension,n,（精神上的）緊張，焦慮，焦急,You could feel the tension in the room as we waited for our exam results.
+terminal,n,月臺；候機樓，航廈；碼頭,Terminal 3 is used mostly for domestic flights.
+terms,n,期，期限,He served a short term for drunk driving.
+terribly,adv,很糟；很不好,I slept terribly last night.
+terrify,v,使害怕，使恐懼,The idea of parachuting out of a plane terrifies me.
+territory,n,領土；領域；領地；活動範圍,He was shot down in enemy territory.
+terror,n,（暴行引起的）恐懼，驚駭,They fled from the city in terror.
+terrorism,n,恐怖主義,Governments must cooperate if they are to fight/combat international terrorism.
+terrorist,n,恐怖分子,Several terrorists have been killed by their own bombs.
+testing,n,（知識或能力）測試,Statewide testing begins this fall.
+textbook,n,教科書，教材，課本,Open your science textbook to page ten.
+theft,n,盜竊；偷竊行為,"Unfortunately, we have had several thefts in the building recently."
+therapist,n,治療師,The child is seeing a speech therapist.
+thesis,n,論文,She is writing her doctoral thesis.
+thorough,adj,仔細的,The editor did a thorough revision of the manuscript.
+thoroughly,adv,非常,I thoroughly enjoyed the performance.
+thumb,n,拇指,The thorn was embedded in her thumb.
+timing,n,（某事發生的）時間，時機,"""Are we too early?"" ""No, your timing is perfect - dinner is almost ready."""
+tissue,n,（動物或植物的細胞）組織,The lab analyzes samples of human tissue.
+ton,n,噸, (informal) What have you got in this bag? It weighs a ton (= is very heavy).
+tonne,n,公噸,Oil deliveries will fall 2.5 million tonnes short this year.
+tournament,n,錦標賽,He won the chess tournament.
+trace,v,找到，查出，發現,The police are trying to trace the mother of a newborn baby found abandoned outside a hospital.
+trading,n,買賣；貿易；營業；生意,She doesn't approve of Sunday trading (= shops being open on Sunday).
+tragedy,n,悲劇性事件，災難，不幸,The pilot averted a tragedy when he succeeded in preventing the plane from crashing.
+tragic,adj,哀痛的；悲慘的,His friends were deeply shocked and saddened by the tragic news of his death.
+trait,n,（個人的）特徵，特性，品質,His sense of humour is one of his better traits.
+transmit,v,播送，發射，傳送（信號）,Radio Seven transmits on 201 medium wave (= uses those particular radio waves to broadcast on).
+transportation,n,運輸，運送，輸送,the safe transportation of used nuclear fuel
+trap,v,設陷阱（或夾子、捕捉器）捕捉,She survived in the wilderness by eating berries and trapping small animals and birds.
+trap,n,陷阱；夾子；捕捉器,The fox got its foot caught in a trap.
+treasure,n,財寶；珍寶,Stories about pirates often include a search for buried treasure.
+tribe,n,部落；部族,The anthropologist lived with a tribe in the Amazon.
+trigger,v,引起，引發（壞事）,Some people find that certain foods trigger their headaches.
+trillion,number,萬億，兆,The debt amounts to one trillion dollars.
+troop,n,部隊，軍隊,"Traditionally, United Nations troops have been deployed only in a peacekeeping role."
+tsunami,n,海嘯,A tsunami early warning system was set up in Hawaii.
+ultimate,adj,極端的；最重要的；最初（或終）的；最好（差）的,Of course the ultimate responsibility for the present conflict without doubt lies with the aggressor.
+unacceptable,adj,不能接受（或同意、允許）的,The teachers' union has described the latest pay offer as unacceptable.
+uncertainty,n,不確定性；不確定因素；不確定（或未知）的事物,"Nothing is ever decided, and all the uncertainty is very bad for staff morale."
+undergo,v,經歷，經受（令人不快的事或變化）,She underwent an operation on a tumour in her left lung last year.
+undertake,v,（開始）做，承擔，從事（尤指耗時或困難之事）,Students are required to undertake simple experiments.
+unfold,v,打開；展開；攤開,He watched her expression as she unfolded the letter.
+unfortunate,adj,不幸的，倒楣的,"She has inherited her father's large nose, which is very unfortunate."
+unite,v,（使）結合；（使）聯合；（使）團結,"If the opposition groups unite, they may will command over 55 percent of the vote."
+unity,n,聯合；一致；團結；和睦,European political and economic unity
+universal,adj,普遍的；全體的；共同的,It is a universal truth that everyone wants to be happy.
+urgent,adj,緊急的，急迫的,He's got to sign that paper - will you tell him it's urgent?
+usage,n,（詞語或語言的）用法,This book is a guide to common English usage.
+useless,adj,無用的；無效的,"Without fuel, the vehicles will become useless for moving supplies."
+valid,adj,確鑿的；合理的；有根據的；讓人信服的,You have raised a valid argument.
+variation,n,變化；變動,Unemployment rates among white-collar workers show much less regional variation than corresponding rates among blue-collar workers.
+vertical,adj,豎直的；垂直的；立式的,The wallpaper has vertical stripes.
+viewpoint,n,觀察位置；角度,The viewpoint by the side of the road gave us a stunning panorama of the whole valley.
+visa,n,簽證,We travelled to Argentina on a tourist visa.
+visible,adj,可以看見的；可視的,You should wear something light-coloured when you're cycling at night so that you're more visible.
+voluntary,adj,自願的；志願的,She does voluntary work for the Red Cross two days a week.
+voting,n,選舉；投票,Voting went ahead despite threats from rebel groups.
+wander,v,漫步；閒逛；遊蕩,We spent the morning wandering around the old part of the city.
+warming,n,加熱；變暖,atmospheric warming
+weekly,adj,每週一次的（地）,I subscribe to a weekly magazine.
+weird,adj,怪異的；不尋常的；出乎意料的；超自然的,He was sitting alone by a window with a weird contraption on the table in front of him.
+welfare,n,福利救濟；社會福利,Your taxes pay for welfare benefits such as unemployment and sickness pay.
+wheat,n,小麥,The farmer owns large wheat fields.
+whoever,pron,…的那個人,Whoever uprooted that tree ought to be ashamed of themselves.
+widespread,adj,廣泛的；普遍的；遍佈的,There are reports of widespread flooding in northern France.
+wisdom,n,智慧；明智,I certainly hope to gain a little wisdom as I grow older.
+withdraw,v,抽回；取回；提取；撤回；撤離；退出；移回,This credit card allows you to withdraw up to £200 a day from ATMs.
+workforce,n,勞動力；工人；勞動人口,The majority of factories in the region have a workforce of 50 to 100 (people).
+workplace,n,工作場所,The survey asks workers about facilities in their workplace.
+workshop,n,車間，廠房，作坊,He spends all day in his workshop.
+worm,n,蠕蟲,"The kiwi bird eats worms, other invertebrates, and berries."
+wrist,n,手腕；腕關節,I sprained my wrist playing tennis.
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,`;
+
+    // --- State ---
+    let questionBank = [];
+    let currentQuiz = [];
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let userAnswers = [];
+    let isFirstAttempt = true;
+
+    // --- Helpers ---
+    function showError(msg) {
+        const el = document.getElementById('error-message');
+        el.textContent = msg;
+        el.style.display = 'block';
+        console.error(msg);
+    }
+
+    function escapeRegExp(string) {
+        return string.replace(/[.*+?^${}()|[]]/g, '\\$&');
+    }
+
+    // --- Initialization ---
+    function initApp() {
+        try {
+            document.getElementById('year').textContent = new Date().getFullYear();
+            document.getElementById('error-message').style.display = 'none';
+            parseCSV();
+            showScreen('start-screen');
+        } catch (e) {
+            showError("Initialization Error: " + e.message);
+        }
+    }
+
+    // Robust State Machine CSV Parser
+    function parseCSV() {
+        questionBank = [];
+        const text = rawCsvData.trim();
+        
+        let currentRow = [];
+        let currentField = "";
+        let inQuotes = false;
+        
+        for (let i = 0; i < text.length; i++) {
+            const char = text[i];
+            const nextChar = text[i + 1];
+
+            if (inQuotes) {
+                if (char === '"' && nextChar === '"') {
+                    currentField += '"';
+                    i++; 
+                } else if (char === '"') {
+                    inQuotes = false;
+                } else {
+                    currentField += char;
+                }
+            } else {
+                if (char === '"') {
+                    inQuotes = true;
+                } else if (char === ',') {
+                    currentRow.push(currentField);
+                    currentField = "";
+                } else if (char === '\n' || char === '\r') {
+                    if (char === '\r' && nextChar === '\n') i++;
+                    currentRow.push(currentField);
+                    processRow(currentRow);
+                    currentRow = [];
+                    currentField = "";
+                } else {
+                    currentField += char;
+                }
+            }
+        }
+        if (currentField || currentRow.length > 0) {
+            currentRow.push(currentField);
+            processRow(currentRow);
+        }
+    }
+
+    function processRow(row) {
+        if (row.length < 4) return;
+        
+        const word = row[0].trim();
+        if (!word) return;
+
+        const pos = row[1]?.trim() || "";
+        const def = row[2]?.trim() || "";
+        let sentence = row[3]?.trim() || "";
+
+        // --- Logic to fix incomplete sentences (Enhanced) ---
+        if (sentence) {
+            // 1. Capitalize first letter
+            if (/^[a-z]/.test(sentence)) {
+                sentence = sentence.charAt(0).toUpperCase() + sentence.slice(1);
+            }
+
+            // 2. Ensure punctuation at end
+            if (!/[.!?]$/.test(sentence)) {
+                sentence += ".";
+            }
+            
+            // 3. Fix short fragments (e.g., "Monthly payments.")
+            const wordCount = sentence.split(' ').length;
+            
+            // Heuristic: Very short sentence (<= 4 words) without obvious verb?
+            // Or starts with article and is short.
+            const hasVerb = /\b(is|are|was|were|has|have|had|will|can|could|should|would|must)\b/.test(sentence);
+            const startsWithArticle = /^(A|An|The)\s/.test(sentence);
+
+            if (wordCount <= 4 && !hasVerb) {
+                // Check if plural or singular roughly by checking if word ends in s (imperfect but helpful)
+                // "Monthly payments" -> ends in s -> "These are..."
+                // "A naked man" -> "He is..." or "This is..."
+                if (sentence.trim().endsWith('s.') || sentence.trim().endsWith('s')) {
+                    sentence = "These are " + sentence.charAt(0).toLowerCase() + sentence.slice(1);
+                } else {
+                    sentence = "It is " + sentence.charAt(0).toLowerCase() + sentence.slice(1);
+                }
+            } else if (wordCount < 6 && startsWithArticle && !hasVerb) {
+                 sentence = "It is " + sentence.charAt(0).toLowerCase() + sentence.slice(1);
+            }
+        } else {
+            sentence = `I can see ${word} clearly.`;
+        }
+
+        questionBank.push({
+            baseForm: word,
+            pos: pos,
+            definition_ch: def,
+            sentence: sentence
+        });
+    }
+
+    // --- Navigation ---
+    function showScreen(screenId) {
+        ['start-screen', 'quiz-screen', 'end-screen'].forEach(id => {
+            document.getElementById(id).style.display = (id === screenId) ? 'block' : 'none';
+        });
+    }
+
+    function startQuiz(numQuestions) {
+        try {
+            if (questionBank.length === 0) {
+                throw new Error("No questions loaded. Please check data source.");
+            }
+
+            const shuffled = [...questionBank].sort(() => 0.5 - Math.random());
+            const count = Math.min(parseInt(numQuestions), shuffled.length);
+            currentQuiz = shuffled.slice(0, count);
+            
+            currentQuestionIndex = 0;
+            score = 0;
+            userAnswers = [];
+            
+            showScreen('quiz-screen');
+            loadQuestion();
+        } catch (e) {
+            showError("Start Quiz Error: " + e.message);
+        }
+    }
+
+    // --- Conjugation Logic ---
+    function getInflectionType(base, actual) {
+        if (!base || !actual) return 'base';
+        base = base.toLowerCase();
+        actual = actual.toLowerCase();
+        if (base === actual) return 'base';
+        if (actual.endsWith('s') && !base.endsWith('s')) return 's'; 
+        if (actual.endsWith('ed')) return 'ed';
+        if (actual.endsWith('ing')) return 'ing';
+        return 'base';
+    }
+
+    function conjugate(word, type) {
+        if (!word) return "";
+        if (type === 'base') return word;
+        
+        const lastChar = word.slice(-1);
+        const secondLastChar = word.slice(-2, -1);
+        const isVowel = c => ['a','e','i','o','u'].includes(c);
+        const isConsonant = c => !isVowel(c);
+        const endsInY = lastChar === 'y';
+        const isCVC = word.length > 2 && isConsonant(word.slice(-3,-2)) && isVowel(secondLastChar) && isConsonant(lastChar);
+        const isWXY = ['w','x','y'].includes(lastChar);
+
+        if (type === 's') {
+             if (endsInY && isConsonant(secondLastChar)) return word.slice(0, -1) + 'ies';
+             if (['s','x','z','ch','sh'].some(end => word.endsWith(end))) return word + 'es';
+             return word + 's';
+        }
+        if (type === 'ing') {
+            if (lastChar === 'e' && !word.endsWith('ee')) return word.slice(0, -1) + 'ing';
+            if (isCVC && !isWXY) return word + lastChar + 'ing';
+            return word + 'ing';
+        }
+        if (type === 'ed') {
+            if (lastChar === 'e') return word + 'd';
+            if (endsInY && isConsonant(secondLastChar)) return word.slice(0, -1) + 'ied';
+            if (isCVC && !isWXY) return word + lastChar + 'ed';
+            return word + 'ed';
+        }
+        return word;
+    }
+
+    // --- Question Logic ---
+    function loadQuestion() {
+        try {
+            isFirstAttempt = true;
+            document.getElementById('next-btn').style.display = 'none';
+            document.getElementById('feedback-container').innerHTML = '';
+            
+            if (!currentQuiz[currentQuestionIndex]) {
+                throw new Error("Question index out of bounds");
+            }
+
+            const qData = currentQuiz[currentQuestionIndex];
+            const baseWord = qData.baseForm;
+            let sentence = qData.sentence;
+
+            const escapedBase = escapeRegExp(baseWord);
+            const regex = new RegExp(`\\b${escapedBase}(?:s|es|d|ed|ing|ied)?\\b`, 'i');
+            const match = sentence.match(regex);
+
+            let targetWordInSentence = baseWord;
+            let inflectionType = 'base';
+
+            if (match) {
+                targetWordInSentence = match[0];
+                inflectionType = getInflectionType(baseWord, targetWordInSentence);
+                sentence = sentence.replace(match[0], `<span class="blank"></span>`);
+            } else {
+                sentence = sentence.replace(baseWord, `<span class="blank"></span>`);
+            }
+
+            // Article Correction
+            sentence = sentence.replace(/(?<!\/)\b(a|an)\s+<span class="blank"><\/span>/gi, "a/an <span class=\"blank\"></span>");
+            sentence = sentence.replace(/(?<!\/)\b(A|An)\s+<span class="blank"><\/span>/gi, "A/An <span class=\"blank\"></span>");
+
+            document.getElementById('question-counter').textContent = `Question: ${currentQuestionIndex + 1} / ${currentQuiz.length}`;
+            document.getElementById('score-counter').textContent = `Score: ${score}`;
+            document.getElementById('question-text').innerHTML = sentence;
+
+            const options = generateOptions(qData, inflectionType, targetWordInSentence);
+            renderOptions(options, targetWordInSentence);
+        } catch (e) {
+            showError("Load Question Error: " + e.message);
+        }
+    }
+
+    function generateOptions(correctData, inflectionType, correctWordInSentence) {
+        // Specific collision list for time-based words to avoid "Monthly" vs "Weekly"
+        const timeWords = ['monthly', 'weekly', 'daily', 'yearly', 'annual', 'overnight', 'shortly', 'lately', 'sometime', 'nowadays'];
+        const isTimeWord = timeWords.includes(correctData.baseForm.toLowerCase());
+
+        // Filter candidates
+        let candidates = questionBank.filter(w => {
+            // Must be different word
+            if (w.baseForm === correctData.baseForm) return false;
+            
+            // Must match POS
+            if (w.pos !== correctData.pos) return false;
+
+            // If correct answer is a time word, exclude other time words
+            if (isTimeWord && timeWords.includes(w.baseForm.toLowerCase())) return false;
+
+            return true;
+        });
+
+        // Shuffle candidates completely to avoid alphabetical neighbors
+        candidates.sort(() => 0.5 - Math.random());
+
+        const distractors = [];
+        let attempts = 0;
+        
+        // Try to find distractors that start with a DIFFERENT letter if possible
+        const correctFirstLetter = correctData.baseForm.charAt(0).toLowerCase();
+
+        for (let i = 0; i < candidates.length && distractors.length < 3; i++) {
+            const candidate = candidates[i];
+            const candFirstLetter = candidate.baseForm.charAt(0).toLowerCase();
+            
+            // Preference: Different starting letter
+            // If we are running out of candidates (attempts > 50), accept same letter
+            if (candFirstLetter !== correctFirstLetter || attempts > 50) {
+                distractors.push(candidate);
+            } else {
+                // Put it back at the end of the array to try later if needed
+                candidates.push(candidate); 
+                attempts++;
+            }
+        }
+
+        // If still not enough, just fill from remaining
+        while (distractors.length < 3 && candidates.length > 0) {
+             distractors.push(candidates.pop());
+        }
+
+        const options = distractors.map(d => {
+            return {
+                text: conjugate(d.baseForm, inflectionType),
+                isCorrect: false,
+                data: d
+            };
+        });
+
+        options.push({
+            text: correctWordInSentence,
+            isCorrect: true,
+            data: correctData
+        });
+
+        return options.sort(() => 0.5 - Math.random());
+    }
+
+    function renderOptions(options, correctWordText) {
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+
+        options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            // CSS handles lowercase display, but let's ensure text is uniform in DOM too if needed
+            // Actually, keeping original text in DOM is fine, CSS 'text-transform: lowercase' does the visual job requested.
+            btn.textContent = opt.text; 
+            btn.onclick = () => handleOptionClick(btn, opt, correctWordText);
+            container.appendChild(btn);
+        });
+    }
+
+    function handleOptionClick(btn, option, correctWordText) {
+        const feedback = document.getElementById('feedback-container');
+        
+        feedback.innerHTML = `<span style="color:var(--accent-color)">${option.data.baseForm}</span> (${option.data.pos}): ${option.data.definition_ch}`;
+
+        if (option.isCorrect) {
+            btn.classList.add('correct');
+            const allBtns = document.querySelectorAll('.option-btn');
+            allBtns.forEach(b => b.disabled = true);
+
+            const blank = document.querySelector('.blank');
+            if (blank) {
+                blank.textContent = correctWordText;
+                blank.classList.add('revealed');
+            }
+
+            if (isFirstAttempt) {
+                score++;
+                document.getElementById('score-counter').textContent = `Score: ${score}`;
+            }
+
+            userAnswers.push({
+                question: currentQuiz[currentQuestionIndex],
+                correctWord: correctWordText
+            });
+
+            document.getElementById('next-btn').style.display = 'inline-block';
+        } else {
+            btn.classList.add('incorrect');
+            btn.disabled = true;
+            isFirstAttempt = false;
+        }
+    }
+
+    function nextQuestion() {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < currentQuiz.length) {
+            loadQuestion();
+        } else {
+            endQuiz();
+        }
+    }
+
+    function endQuiz() {
+        showScreen('end-screen');
+        const total = currentQuiz.length;
+        const percentage = total > 0 ? (score / total) * 100 : 0;
+        
+        document.getElementById('final-score').textContent = `${score} / ${total}`;
+        
+        let comment = "";
+        if (percentage === 100) comment = "Flawless! You've mastered these words. Well done!";
+        else if (percentage >= 80) comment = "Excellent work! You have a strong command of these words.";
+        else if (percentage >= 60) comment = "Good job! A little more revision will make you an expert.";
+        else if (percentage >= 40) comment = "Solid effort. Keep practicing to get more familiar with the words.";
+        else comment = "A good start. Do some revision and try again to boost your score!";
+        
+        document.getElementById('end-comment').textContent = comment;
+
+        const list = document.getElementById('revision-list');
+        list.innerHTML = '';
+        
+        userAnswers.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'revision-item';
+            
+            const escapedWord = escapeRegExp(item.correctWord);
+            const regex = new RegExp(`\\b${escapedWord}\\b`, 'i');
+            const highlightedSentence = item.question.sentence.replace(regex, `<strong>${item.correctWord}</strong>`);
+
+            div.innerHTML = `
+                <p class="word-info">${item.question.baseForm} <span>(${item.question.pos})</span>: ${item.question.definition_ch}</p>
+                <p class="sentence-info">${highlightedSentence}</p>
+            `;
+            list.appendChild(div);
+        });
+    }
+
+    // Start App
+    initApp();
+
+</script>
+
+
+
+</body></html>
