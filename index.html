@@ -559,7 +559,7 @@
             { word: 'seminar', baseForm: 'seminar', pos: 'n', definition_ch: '專題討論會；研討會', sentence: 'I attended practically every lecture and _______ when I was a student.' },
             { word: 'settlers', baseForm: 'settler', pos: 'n', definition_ch: '（尤指來自別國的）移居者，定居者；殖民者', sentence: 'Most of the _______ came from England.' },
             { word: 'severely', baseForm: 'severely', pos: 'adv', definition_ch: '嚴重地', sentence: 'Their daughter was _______ injured in a car accident.' },
-            { word: 'sexy', baseForm: 'sexy', pos: 'adj', definition_ch: '性感的', sentence: 'He\'s very _______.' },
+            { word: 'sexy', baseForm: 'sexy', pos: 'adj', definition_ch: '性感的', sentence: 'She\'s wearing a very _______ outfit.' },
             { word: 'shaped', baseForm: 'shaped', pos: 'adj', definition_ch: '呈…形狀的', sentence: 'The child found an unusually _______ carrot while digging in the vegetable garden.' },
             { word: 'shocking', baseForm: 'shocking', pos: 'adj', definition_ch: '令人厭惡的；令人難過的；不道德的', sentence: 'The sex scenes in the book were considered very _______ at the time when it was published.' },
             { word: 'shore', baseForm: 'shore', pos: 'n', definition_ch: '（海、湖或大河的）濱，岸', sentence: 'You can walk for miles along the _______.' },
@@ -788,11 +788,24 @@
             
             const options = shuffleArray([correctOption, ...distractors]);
             
+            // Determine if we need to force capitalization for ALL options.
+            // This happens if the sentence starts with the blank OR if the correct word in the database is capitalized (like "Moreover").
+            const shouldCapitalize = question.sentence.trim().startsWith('_______') || /^[A-Z]/.test(question.word);
+
             optionsContainer.innerHTML = '';
             options.forEach(option => {
                 const button = document.createElement('button');
-                button.textContent = option.word;
+                
+                // Apply capitalization logic for DISPLAY only
+                let displayWord = option.word;
+                if (shouldCapitalize) {
+                    displayWord = displayWord.charAt(0).toUpperCase() + displayWord.slice(1);
+                }
+
+                button.textContent = displayWord;
                 button.classList.add('option-btn');
+                
+                // Keep original data for logic checking
                 button.dataset.word = option.word;
                 button.dataset.baseForm = option.baseForm;
                 button.dataset.pos = option.pos;
