@@ -104,6 +104,8 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
+            /* Added gap to prevent boxes from fusing together */
+            gap: 10px;
         }
 
         #question-counter, #score-counter {
@@ -112,6 +114,8 @@
             background-color: var(--primary-color);
             padding: 5px 15px;
             border-radius: 5px;
+            /* Ensure text doesn't wrap awkwardly inside the badge */
+            white-space: nowrap;
         }
         
         #return-btn {
@@ -120,6 +124,7 @@
             color: var(--accent-color);
             padding: 8px 15px;
             font-size: 0.9rem;
+            white-space: nowrap;
         }
         #return-btn:hover {
             background-color: var(--accent-color);
@@ -256,24 +261,84 @@
             text-align: center;
         }
 
+        /* Mobile Optimization */
         @media (max-width: 600px) {
+            body {
+                padding: 10px; /* Reduce body padding */
+            }
+
             .app-container {
-                padding: 15px;
+                padding: 15px 10px; /* Reduce container padding */
             }
-            header h2 {
-                font-size: 1.5rem;
+
+            /* Compact Header */
+            header {
+                margin-bottom: 10px;
+                padding-bottom: 10px;
             }
-            #question-text {
-                font-size: 1.2rem;
-            }
-            #options-container {
-                grid-template-columns: 1fr;
-            }
-            .option-btn {
+            header h1 {
                 font-size: 1rem;
             }
+            header h2 {
+                font-size: 1.4rem;
+                margin: 5px 0;
+            }
+            header p {
+                font-size: 0.8rem;
+            }
+
+            /* Compact Quiz Header & Fix Fusion */
+            #quiz-screen .quiz-header {
+                margin-bottom: 10px;
+                gap: 8px; /* Ensure space between items */
+                flex-wrap: wrap; /* Allow wrapping if needed */
+                justify-content: center;
+            }
+            
+            #question-counter, #score-counter {
+                font-size: 0.8rem;
+                padding: 4px 8px; /* Smaller padding */
+                flex: 1 1 auto; /* Allow flexible sizing */
+            }
+
+            #return-btn {
+                font-size: 0.8rem;
+                padding: 4px 10px;
+            }
+
+            /* Compact Question Text */
+            #question-text {
+                font-size: 1.1rem;
+                margin: 15px 0; /* Reduced margin */
+                min-height: auto; /* Remove large fixed height */
+                line-height: 1.4;
+            }
+
             .blank {
                 width: 80px;
+            }
+
+            /* Compact Options */
+            #options-container {
+                grid-template-columns: 1fr; /* Stack options */
+                gap: 8px; /* Reduced gap */
+                margin-bottom: 15px;
+            }
+
+            .option-btn {
+                font-size: 0.95rem;
+                padding: 10px; /* Reduced padding to save height */
+            }
+
+            /* Compact Feedback */
+            #feedback-container {
+                margin-top: 10px;
+                min-height: 30px;
+                font-size: 1rem;
+            }
+
+            footer {
+                margin-top: 15px;
             }
         }
     </style>
@@ -702,9 +767,8 @@
         ];
 
         function correctIndefiniteArticles(bank) {
-            // DEFINITIVE FIX: This regex now uses a "negative lookbehind" (?<!\/) to ensure it only
-            // matches 'a' or 'an' if it is NOT preceded by a forward slash. This prevents the
-            // "a/a/an" error by making the function idempotent.
+            // This regex matches 'a' or 'an' followed by the blank, but ensures it doesn't match if it's already 'a/an'
+            // It uses a negative lookbehind (?<!\/) to ensure the 'a' or 'an' isn't preceded by a slash.
             const articleRegex = /(?<!\/)\b(a|an)\s+_______/gi;
             const replacement = 'a/an _______';
             
