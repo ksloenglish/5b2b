@@ -995,6 +995,14 @@
                     score++;
                 }
                 disableOptions();
+                
+                // Update button text if it is the last question
+                if (currentQuestionIndex === questionsToAttempt - 1) {
+                    nextBtn.textContent = 'Finish Quiz';
+                } else {
+                    nextBtn.textContent = 'Next Question';
+                }
+
                 nextBtn.style.display = 'inline-block';
             } else {
                 selectedButton.classList.add('incorrect');
